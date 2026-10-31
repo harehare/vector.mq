@@ -1,0 +1,33 @@
+import "vector"
+
+# Each `_small` / `_large` pair runs the same work at two sizes. Quadrupling the length of a vector or
+# the number of vectors should take about 4 times as long. A bigger ratio means something copies on
+# every step.
+
+def vec(n, seed): map(range(0, n - 1), fn(i): (i * 7 + seed * 13 + i * i) % 17 - 8;);
+
+def corpus(count, dim): map(range(0, count - 1), fn(c): vec(dim, c););
+
+def bench_dot_small(): vector::dot(vec(250, 1), vec(250, 2));
+
+def bench_dot_large(): vector::dot(vec(1000, 1), vec(1000, 2));
+
+def bench_cosine_small(): vector::cosine(vec(250, 1), vec(250, 2));
+
+def bench_cosine_large(): vector::cosine(vec(1000, 1), vec(1000, 2));
+
+def bench_normalize_small(): len(vector::normalize(vec(250, 3)));
+
+def bench_normalize_large(): len(vector::normalize(vec(1000, 3)));
+
+def bench_mean_small(): len(vector::mean(corpus(250, 16)));
+
+def bench_mean_large(): len(vector::mean(corpus(1000, 16)));
+
+def bench_nearest_small(): len(vector::nearest(vec(16, 99), corpus(250, 16), 5));
+
+def bench_nearest_large(): len(vector::nearest(vec(16, 99), corpus(1000, 16), 5));
+
+def bench_nearest_by_distance_small(): len(vector::nearest_by_distance(vec(16, 99), corpus(250, 16), 5));
+
+def bench_nearest_by_distance_large(): len(vector::nearest_by_distance(vec(16, 99), corpus(1000, 16), 5));

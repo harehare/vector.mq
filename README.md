@@ -44,4 +44,5 @@ Vectors of different lengths are an error. Searching costs O(n log k) for `n` ve
 ```sh
 git submodule update --init
 mq-test -L vendor/ds.mq vector_tests.mq
+mq-bench -L vendor/ds.mq -L . vector_bench.mq
 ```
