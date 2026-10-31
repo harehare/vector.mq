@@ -1,0 +1,89 @@
+import "ds"
+
+# Vector math over arrays of numbers, and nearest-neighbour search.
+
+def _same_length(a, b):
+  if (len(a) != len(b)):
+    error("vector: length mismatch: " + to_string(len(a)) + " and " + to_string(len(b)))
+  else:
+    None
+end
+
+# Returns the dot product.
+def dot(a, b):
+  let _ = _same_length(a, b)
+  | sum(map(zip(a, b), fn(p): p[0] * p[1];))
+end
+
+# Returns the Euclidean length.
+def norm(a): sqrt(sum(map(a, fn(x): x * x;)));
+
+# Returns the element-wise sum.
+def add(a, b):
+  let _ = _same_length(a, b)
+  | map(zip(a, b), fn(p): p[0] + p[1];)
+end
+
+# Returns the element-wise difference `a - b`.
+def sub(a, b):
+  let _ = _same_length(a, b)
+  | map(zip(a, b), fn(p): p[0] - p[1];)
+end
+
+# Multiplies every element by `k`.
+def scale(a, k): map(a, fn(x): x * k;);
+
+# Returns `a` scaled to length 1, or `a` itself when it is the zero vector.
+def normalize(a):
+  let n = norm(a)
+  | if (n == 0): a else: scale(a, 1 / n)
+end
+
+# Returns the cosine similarity, or 0 when either vector is the zero vector.
+def cosine(a, b):
+  let d = norm(a) * norm(b)
+  | if (d == 0): 0 else: dot(a, b) / d
+end
+
+# Returns the Euclidean distance.
+def euclidean(a, b):
+  let _ = _same_length(a, b)
+  | sqrt(sum(map(zip(a, b), fn(p): (p[0] - p[1]) * (p[0] - p[1]);)))
+end
+
+# Returns the element-wise mean of non-empty `vectors`.
+def mean(vectors):
+  if (is_empty(vectors)):
+    error("vector: mean of no vectors")
+  else:
+    scale(fold(slice(vectors, 1, len(vectors)), first(vectors), fn(acc, v): add(acc, v);), 1 / len(vectors))
+end
+
+# Returns the `k` vectors most similar to `query` by cosine similarity, as [score, index] pairs with
+# the highest score first. Ties go to the larger index.
+def nearest(query, vectors, k):
+  let n = len(vectors)
+  | if (n == 0 || k <= 0):
+      []
+    else:
+      do
+        let qn = norm(query)
+        | let scored = map(range(0, n - 1), fn(i): [_cosine_with(query, qn, vectors[i]), i];)
+        | ds::heap::largest(scored, k)
+      end
+end
+
+# Returns the `k` vectors closest to `query` by Euclidean distance, as [distance, index] pairs with
+# the smallest distance first. Ties go to the smaller index.
+def nearest_by_distance(query, vectors, k):
+  let n = len(vectors)
+  | if (n == 0 || k <= 0):
+      []
+    else:
+      ds::heap::smallest(map(range(0, n - 1), fn(i): [euclidean(query, vectors[i]), i];), k)
+end
+
+def _cosine_with(query, query_norm, v):
+  let d = query_norm * norm(v)
+  | if (d == 0): 0 else: dot(query, v) / d
+end
