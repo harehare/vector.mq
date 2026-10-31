@@ -7,8 +7,7 @@ end
 
 def assert_vec_close(actual, expected):
   assert_eq(len(actual), len(expected))
-  | let _ = foreach(p, zip(actual, expected)): assert_close(p[0], p[1]);
-  | None
+  | assert_eq(filter(zip(actual, expected), fn(p): abs(p[0] - p[1]) >= 0.000000001;), [])
 end
 
 def fails(f): try: f() catch: "failed";
