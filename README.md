@@ -1,5 +1,8 @@
 <h1 align="center">vector.mq</h1>
 
+> [!WARNING]
+> This project is currently under active development. APIs and features may change without notice.
+
 Vector math and nearest-neighbour search for [mq](https://github.com/harehare/mq), as a module. Vectors are plain arrays of numbers.
 
 ## Installation
