@@ -12,22 +12,42 @@ end
 # Returns the dot product.
 def dot(a, b):
   let _ = _same_length(a, b)
-  | sum(map(zip(a, b), fn(p): p[0] * p[1];))
+  | do
+      let n = len(a)
+      | var s = 0
+      | var i = 0
+      | while (i < n):
+          s += a[i] * b[i]
+          | i += 1
+        end
+      | s
+    end
 end
 
 # Returns the Euclidean length.
-def norm(a): sqrt(sum(map(a, fn(x): x * x;)));
+def norm(a):
+  do
+    let n = len(a)
+    | var s = 0
+    | var i = 0
+    | while (i < n):
+        s += a[i] * a[i]
+        | i += 1
+      end
+    | sqrt(s)
+  end
+end
 
 # Returns the element-wise sum.
 def add(a, b):
   let _ = _same_length(a, b)
-  | map(zip(a, b), fn(p): p[0] + p[1];)
+  | if (is_empty(a)): [] else: foreach (i, range(0, len(a) - 1)): a[i] + b[i];
 end
 
 # Returns the element-wise difference `a - b`.
 def sub(a, b):
   let _ = _same_length(a, b)
-  | map(zip(a, b), fn(p): p[0] - p[1];)
+  | if (is_empty(a)): [] else: foreach (i, range(0, len(a) - 1)): a[i] - b[i];
 end
 
 # Multiplies every element by `k`.
@@ -48,7 +68,17 @@ end
 # Returns the Euclidean distance.
 def euclidean(a, b):
   let _ = _same_length(a, b)
-  | sqrt(sum(map(zip(a, b), fn(p): (p[0] - p[1]) * (p[0] - p[1]);)))
+  | do
+      let n = len(a)
+      | var s = 0
+      | var i = 0
+      | while (i < n):
+          let d = a[i] - b[i]
+          | s += d * d
+          | i += 1
+        end
+      | sqrt(s)
+    end
 end
 
 # Returns the element-wise mean of non-empty `vectors`.
@@ -70,6 +100,28 @@ def nearest(query, vectors, k):
         let qn = norm(query)
         | let scored = map(range(0, n - 1), fn(i): [_cosine_with(query, qn, vectors[i]), i];)
         | ds::heap::largest(scored, k)
+      end
+end
+
+# Builds an index over `vectors` for repeated `search` calls. The vectors are normalized once, so a
+# search only needs a dot product per vector. Build it once and reuse it; for a single query,
+# `nearest` is cheaper.
+def index(vectors):
+  {"vectors": map(vectors, normalize)}
+end
+
+# Returns the `k` vectors in `idx` most similar to `query` by cosine similarity, as [score, index]
+# pairs with the highest score first. Ties go to the larger index. Gives the same result as `nearest`
+# over the vectors the index was built from.
+def search(idx, query, k):
+  let nv = idx["vectors"]
+  | let n = len(nv)
+  | if (n == 0 || k <= 0):
+      []
+    else:
+      do
+        let q = normalize(query)
+        | ds::heap::largest(map(range(0, n - 1), fn(i): [dot(q, nv[i]), i];), k)
       end
 end
 

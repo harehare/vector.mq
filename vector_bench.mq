@@ -31,3 +31,12 @@ def bench_nearest_large(): len(vector::nearest(vec(16, 99), corpus(1000, 16), 5)
 def bench_nearest_by_distance_small(): len(vector::nearest_by_distance(vec(16, 99), corpus(250, 16), 5));
 
 def bench_nearest_by_distance_large(): len(vector::nearest_by_distance(vec(16, 99), corpus(1000, 16), 5));
+
+def bench_index_small(): len(vector::index(corpus(250, 16))["vectors"]);
+
+def bench_index_large(): len(vector::index(corpus(1000, 16))["vectors"]);
+
+# Each run rebuilds the index, so subtract `bench_index_*` to get the cost of the search alone.
+def bench_search_small(): len(vector::search(vector::index(corpus(250, 16)), vec(16, 99), 5));
+
+def bench_search_large(): len(vector::search(vector::index(corpus(1000, 16)), vec(16, 99), 5));

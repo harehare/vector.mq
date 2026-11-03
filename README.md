@@ -38,7 +38,17 @@ mq -L . -L vendor/ds.mq -I null '
 | `euclidean(a, b)` | Euclidean distance |
 | `mean(vectors)` | element-wise mean of a non-empty array of vectors |
 | `nearest(query, vectors, k)` | the `k` most similar vectors as `[score, index]`, highest first |
+| `index(vectors)` / `search(idx, query, k)` | normalize `vectors` once, then answer many queries; same result as `nearest` |
 | `nearest_by_distance(query, vectors, k)` | the `k` closest vectors as `[distance, index]`, closest first |
+
+For many queries over the same vectors, build an index once and reuse it. A search then costs one dot
+product per vector, about half of `nearest`:
+
+```
+import "vector"
+| let idx = vector::index(vectors)
+| vector::search(idx, query, 5)
+```
 
 Vectors of different lengths are an error. Searching costs O(n log k) for `n` vectors.
 
