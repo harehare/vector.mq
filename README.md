@@ -5,6 +5,10 @@
 
 Vector math and nearest-neighbour search for [mq](https://github.com/harehare/mq), as a module. Vectors are plain arrays of numbers.
 
+## Requirements
+
+mq v0.10.1 or later.
+
 ## Installation
 
 `vector.mq` imports [ds.mq](https://github.com/harehare/ds.mq) for its heap, which is included as a git submodule:
